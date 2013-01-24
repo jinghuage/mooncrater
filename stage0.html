@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head><style>
+body{margin:0px;}
+.h,.v{stroke:black;stroke-dasharray:4 4;stroke-width:1;stroke-opacity:.5;}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+</style></head>
+<body>
+<script src="http://mbostock.github.com/d3/d3.v2.min.js"></script>
+
+<script>
+var width = 500,
+    height = 500, 
+    margin = 50;
+
+var svg=d3.select("body").append("svg").attr("width",width).attr("height",height);
+var x=d3.scale.linear().domain([-90, 90]).range([margin,width-margin]);
+var y=d3.scale.linear().domain([0, 360]).range([height-margin,margin]);
+
+var r=d3.scale.linear().domain([0,400]).range([0,20]);
+var o=d3.scale.linear().domain([1733500,1738140]).range([.5,1]);
+
+var c=d3.scale.category20().domain(["AA","SF","DO","LC","MO", "PR", "RI", "AL", "RU", "LF", "VA"]);
+
+var xAxis = d3.svg.axis()
+  .scale(x)
+  .orient("bottom");
+
+var yAxis = d3.svg.axis()
+  .scale(y)
+  .orient("left");
+
+svg.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(0," + (height - margin) + ")")
+  .call(xAxis);
+
+svg.append("g")
+  .attr("class", "axis")
+   .attr("transform", "translate(" + margin + ",0)")
+  .call(yAxis);
+
+svg.selectAll(".h").data(d3.range(50,360,50)).enter()
+  .append("line").classed("h",1)
+  .attr("x1",margin).attr("x2",height-margin)
+  .attr("y1",y).attr("y2",y)
+  
+svg.selectAll(".v").data(d3.range(-70,90,30)).enter()
+  .append("line").classed("v",1)
+  .attr("y1",margin).attr("y2",width-margin)
+  .attr("x1",x).attr("x2",x)
+  
+
+// now add titles to the axes
+svg.append("text")
+   .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+   .attr("transform", "translate("+ (margin/3) +","+(height/2)+")rotate(-90)")  
+   .text("Longitude");
+ 
+svg.append("text")
+   .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+   .attr("transform", "translate("+ (width/2) +","+(height-(margin/3))+")")  // centre below axis
+   .text("Latitude");
+
+
+d3.csv("moontest.csv",function(csv) {
+
+  //console.log(csv);
+
+
+  // we first sort the data
+  csv.sort(function(a,b) {return b.size-a.size;});
+
+  console.log(csv);
+  
+  // then we create the marks, which we put in an initial position
+
+  svg.selectAll("circle").data(csv).enter()
+    .append("circle")
+    .attr("cx",function(d) {return x(0);})
+    .attr("cy",function(d) {return y(0);})
+    .attr("r",function(d) {return r(5);})
+
+    .style("fill",function(d) {return c(d.grade);})
+    .style("opacity",function(d) {return o(+d.surfacedepth);})
+
+      .append("title")
+      .text(function(d) {return d.name;})
+
+  // now we initiate - moving the marks to their position
+
+  svg.selectAll("circle").transition().duration(1000)
+    .attr("cx",function(d) {return x(+d.latitude);})
+    .attr("cy",function(d) {return y(+d.longitude);})
+    .attr("r",function(d) {return r(Math.sqrt(+d.size));})
+})
+
+</script>
+
+
+</body>
+</html>
