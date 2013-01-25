@@ -26,103 +26,59 @@ body{margin:0px;}
 <script src="http://mbostock.github.com/d3/d3.v2.min.js"></script>
 <script type="text/javascript" src="http://polymaps.org/polymaps.min.js?2.5.0"></script>
 
+<h1>Visualization moon crater data histogram</h1>
+
+<form id="controls">
+
+<div>
+<h2>X axis</h2>
+<ul id="x-axis">
+  <li><label><input checked="checked" type="radio" name="x-axis" value="latitude">Latitude</label></li>
+  <li><lable><input type="radio" name="x-axis" value="longitude">Longitude</label></li>
+  <li><label><input type="radio" name="x-axis" value="radius">Radius</label></li>
+  <li><lable><input type="radio" name="x-axis" value="surfd">SurfaceDepth</label></li>
+  <li><lable><input type="radio" name="x-axis" value="grade">Grade</label></li>
+</ul>
+</div>
+
+<div>
+<h2>Types of crater</h2>
+<ul id="crater-types">
+  <li><label><input type="checkbox" checked="checked" value="AA">AA</label></li>
+  <li><label><input type="checkbox" checked="checked" value="SF">SF</label></li>
+  <li><label><input type="checkbox" checked="checked" value="DO">DO</label></li>
+  <li><label><input type="checkbox" checked="checked" value="LC">LC</label></li>
+  <li><label><input type="checkbox" checked="checked" value="MO">MO</label></li>
+  <li><label><input type="checkbox" checked="checked" value="PR">PR</label></li>
+  <li><label><input type="checkbox" checked="checked" value="RI">RI</label></li>
+  <li><label><input type="checkbox" checked="checked" value="AL">AL</label></li>
+  <li><label><input type="checkbox" checked="checked" value="RU">RU</label></li>
+  <li><label><input type="checkbox" checked="checked" value="LF">LF</label></li>
+  <li><label><input type="checkbox" checked="checked" value="VA">VA</label></li>
+</ul>
+</div>
 
 
-<script>
-var width = 960,
-    height = 500, 
-    margin = 50;
+<div>
+<h2>Dataset</h2>
+<ul>
+  <li>
+    <select id="dataset">
+	<option value="IAUMOON">Full Dataset</option>
+	<option selected="selected" value="moontest">Test #1</option>
+	<option value="test2">Test #2</option>
+    </select>
+  </li>
+  <li><label><input type="checkbox" id="cull-dirty"> Cull dirty data</label></li>
+</ul>
+</div>
+
+</form>
 
 
 
-var svg=d3.select("body").append("svg").attr("width",width).attr("height",height);
+<script src="stage3-histogram.js"></script>
 
-
-var x=d3.scale.linear().domain([-90, 90]).range([margin,width-margin]);
-var y=d3.scale.linear().domain([0, 360]).range([height-margin,margin]);
-
-var r=d3.scale.linear().domain([0,500]).range([0,20]);
-var o=d3.scale.linear().domain([1730000,1750000]).range([.5,1]);
-
-var c=d3.scale.category20().domain(["AA","SF","DO","LC","MO", "PR", "RI", "AL", "RU", "LF", "VA"]);
-
-var xAxis = d3.svg.axis()
-  .scale(x)
-  .orient("bottom");
-
-var yAxis = d3.svg.axis()
-  .scale(y)
-  .orient("left");
-
-svg.append("g")
-  .attr("class", "axis")
-  .attr("transform", "translate(0," + (height - margin) + ")")
-  .call(xAxis);
-
-svg.append("g")
-  .attr("class", "axis")
-   .attr("transform", "translate(" + margin + ",0)")
-  .call(yAxis);
-
-svg.selectAll(".h").data(d3.range(50,360,50)).enter()
-  .append("line").classed("h",1)
-  .attr("x1",margin).attr("x2",width-margin)
-  .attr("y1",y).attr("y2",y)
-  
-svg.selectAll(".v").data(d3.range(-70,90,30)).enter()
-  .append("line").classed("v",1)
-  .attr("y1",margin).attr("y2",height-margin)
-  .attr("x1",x).attr("x2",x)
-  
-
-// now add titles to the axes
-svg.append("text")
-   .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-   .attr("transform", "translate("+ (margin/3) +","+(height/2)+")rotate(-90)")  
-   .text("Longitude");
- 
-svg.append("text")
-   .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-   .attr("transform", "translate("+ (width/2) +","+(height-(margin/3))+")")  // centre below axis
-   .text("Latitude");
-
-
-d3.csv("IAUMOON.csv",function(csv) {
-
-  //console.log(csv);
-
-  // Transpose the data into layers wanted.
-  var lrs = d3.layout.stack()(["latitude", "longitude", "size", "grade"].map(function(l) {
-    return csv.map(function(d) {
-      return +d[l];
-    });
-  }));
-  
-  //console.log(lrs);
-  
-  // then we create the marks, which we put in an initial position
-
-  svg.selectAll("circle").data(csv).enter()
-    .append("circle")
-    .attr("cx",function(d) {return x(0);})
-    .attr("cy",function(d) {return y(0);})
-    .attr("r",function(d) {return r(5);})
-
-    .style("fill",function(d) {return c(d.grade);})
-    .style("opacity",function(d) {return o(+d.surfacedepth);})
-
-      .append("title")
-      .text(function(d) {return d.name;})
-
-  // now we initiate - moving the marks to their position
-
-  svg.selectAll("circle").transition().duration(1000)
-    .attr("cx",function(d) {return x(+d.latitude);})
-    .attr("cy",function(d) {return y(+d.longitude);})
-    .attr("r",function(d) {return r(Math.sqrt(+d.size));})
-})
-
-</script>
 
 
 </body>
