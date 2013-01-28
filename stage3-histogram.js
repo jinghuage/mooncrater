@@ -110,6 +110,37 @@ init ();
 ////////////////////
 
 
+// update the list of checkboxes which allows the selection of coaster types
+function generateTypesList (data) {
+	var i = data.length,
+		typeNames = {},
+		select = document.getElementById("crater-types"),
+		list = "";
+
+	// loop though each coaster and check it's type's name. If we haven't seen
+	// it before, add it to an object so that we can use it to build the list
+	while (i--) {
+		if (typeof typeNames[data[i].grade.name] == "undefined") {
+			typeNames[data[i].grade.name] = data[i].type.className;
+		}
+	}
+	// loop through the array to generate the list of types
+	for (var key in typeNames) {
+		if (typeNames.hasOwnProperty(key)) {
+			list += '<li class="' + typeNames[key] + '"><label><input type="checkbox" checked="checked" value="' + slugify(key) + '">' + key + '</label></li>';
+		}
+	}
+	// update the form
+	select.innerHTML = list;
+}
+
+
+// take a string and turn it into a WordPress style slug
+function slugify (string) {
+	return string.replace (/([^a-z0-9])/ig, '-').toLowerCase ();
+}
+
+
 // return the name of the dataset which is currently selected
 function getChosenDataset () {
 	var dataselect = d3.select("#dataset");
@@ -118,24 +149,42 @@ function getChosenDataset () {
 
 // get selected x axes
 function getXAxes() {
-    return d3.select("#x-axis input:checked").value;
+    return document.querySelector("#x-axis input:checked").value;
 }
 
 
-// take a raw dataset and remove coasters which shouldn't be displayed
+
+// after analysis, dirty data is considered to be that which can't be converted
+// to a number
+function isDirty (data) {
+	var clean = "latitude longitude size surfacedepth".split(" ").every (function (attribute) {
+		return !isNaN (+data[attribute]) ;
+	});
+	return !clean;
+}
+
+
+// return a list of types which are currently selected
+function plottableTypes () {
+	var types = [].map.call (document.querySelectorAll ("#crater-types input:checked"), function (checkbox) { return checkbox.value;} );
+	return types;
+}
+
+
+// take a raw dataset and remove craters which shouldn't be displayed
 // (i.e. if it is "dirty" or it's type isn't selected)
 function processData (data) {
 	var processed = [],
 		cullDirty = document.getElementById("cull-dirty").checked,
-		coasterTypes = {},
+		craterTypes = {},
 		counter = 1;
 
 	data.forEach (function (data, index) {
-		var coaster,
+		var crater,
 			className = "";
 		if (!(cullDirty && isDirty(data))) { // don't process it if it's dirty and we want to cull dirty data
-				coaster = {
-					id: index // so that the coasters can animate
+				crater = {
+					id: index // so that the craters can animate
 				};
 			for (var attribute in data) {
 				if (data.hasOwnProperty (attribute)) {
