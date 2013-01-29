@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>Data visualisation demo</title>
+
+<style>
+@import url("http://polymaps.org/style.css");
+
+body{
+    background-color: #333;
+    font-family: sans-serif;
+    color: #fff;
+    font-size: 10px;
+}
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+div{
+    float: left;
+    width: 200px;
+}
+
+.h,.v{stroke:black;stroke-dasharray:4 4;stroke-width:1;stroke-opacity:.5;}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+    fill: #fff;
+}
+
+.axis .domain{
+    opacity: 0;
+}
+
+.tick{
+    stroke: #fff;
+}
+
+</style>
+</head>
+
+<body>
+<script src="http://mbostock.github.com/d3/d3.v2.min.js"></script>
+<script type="text/javascript" src="http://polymaps.org/polymaps.min.js?2.5.0"></script>
+
+<h1>Visualization of moon crater data</h1>
+<svg id="visualisation" width="960" height="600"></svg>
+
+<form id="controls">
+
+<div>
+<h2>X axis</h2>
+<ul id="x-axis">
+  <li><label><input checked="checked" type="radio" name="x-axis" value="latitude">Latitude</label></li>
+  <li><lable><input type="radio" name="x-axis" value="longitude">Longitude</label></li>
+  <li><label><input type="radio" name="x-axis" value="size">Diameter</label></li>
+  <li><lable><input type="radio" name="x-axis" value="surfacedepth">SurfaceDepth</label></li>
+</ul>
+</div>
+
+<div>
+<h2>Y axis</h2>
+<ul id="y-axis">
+  <li><label><input type="radio" name="y-axis" value="latitude">Latitude</label></li>
+  <li><lable><input checked="checked" type="radio" name="y-axis" value="longitude">Longitude</label></li>
+  <li><label><input type="radio" name="y-axis" value="size">Diameter</label></li>
+  <li><lable><input type="radio" name="y-axis" value="surfacedepth">SurfaceDepth</label></li>
+</ul>
+</div>
+
+<div>
+<h2>Radius</h2>
+<ul id="r-axis">
+  <li><label><input checked="checked" type="radio" name="r-axis" value="size">Diameter</label></li>
+  <li><lable><input type="radio" name="r-axis" value="surfacedepth">SurfaceDepth</label></li>
+  <li><lable><input type="radio" name="r-axis" value="type">Grade</label></li>
+</ul>
+</div>
+
+
+<div>
+<h2>Types of crater</h2>
+<ul id="crater-types">
+  <li><label><input type="checkbox" checked="checked" value="AA">AA</label></li>
+  <li><label><input type="checkbox" checked="checked" value="SF">SF</label></li>
+  <li><label><input type="checkbox" value="DO">DO</label></li>
+  <li><label><input type="checkbox" value="LC">LC</label></li>
+  <li><label><input type="checkbox" value="MO">MO</label></li>
+  <li><label><input type="checkbox" value="PR">PR</label></li>
+  <li><label><input type="checkbox" value="RI">RI</label></li>
+  <li><label><input type="checkbox" value="AL">AL</label></li>
+  <li><label><input type="checkbox" value="RU">RU</label></li>
+  <li><label><input type="checkbox" value="LF">LF</label></li>
+  <li><label><input type="checkbox" value="VA">VA</label></li>
+</ul>
+</div>
+
+
+<div>
+<h2>Dataset</h2>
+<ul>
+  <li>
+    <select id="dataset">
+	<option value="IAUMOON">Full Dataset</option>
+	<option selected="selected" value="moontest">Test #1</option>
+	<option value="test2">Test #2</option>
+    </select>
+  </li>
+  <li><label><input type="checkbox" id="cull-dirty"> Cull dirty data</label></li>
+</ul>
+</div>
+
+</form>
+
+
+
+<script src="stage3.js"></script>
+
+
+
+</body>
+</html>
