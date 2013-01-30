@@ -5,7 +5,7 @@ var width = 960,
     margins = {top:20, right:20, bottom:20, left:60},
     xRange = d3.scale.linear().range([margins.left, width-margins.right]),
     yRange = d3.scale.linear().range([height-margins.top, margins.bottom]),
-    rRange = d3.scale.linear().range([5, 20]), // radius range function - ensures the radius is between 5 and 20
+    rRange = d3.scale.linear().range([1, 20]), // radius range function - ensures the radius is between 5 and 20
     currentDataset,
     rawData,
     drawingData,
@@ -77,6 +77,7 @@ function redraw() {
 
 
     var t = svg.transition().duration(1500).ease("exp-in-out");
+    //select class, don't put blank space in-between two classes
     t.select(".x.axis").call(xAxis);
     t.select(".y.axis").call(yAxis);
     
@@ -154,10 +155,10 @@ function plottableTypes () {
 	return types;
 }
 
-
-function transposeData(data) {
-    // Transpose the data into layers wanted.
-    var lrs = ["latitude", "longitude", "size", "grade"].map(function(l) {
+// Transpose the data into layers wanted.
+// For histogram vis
+function transposeData(data) {    
+    var lrs = ["latitude", "longitude", "size", "surfacedepth"].map(function(l) {
         return data.map(function(d) {
             return +d[l];
         });
@@ -171,9 +172,9 @@ function transposeData(data) {
 // 
 function processData (data) {
     var processed = [],
-    cullDirty = document.getElementById("cull-dirty").checked,
-    craterTypes = {},
-    counter = 1;
+    cullDirty = document.getElementById("cull-dirty").checked;
+    //craterTypes = {},
+    //counter = 1;
 
     data.forEach (function (data, index) {
 	var crater,
@@ -213,6 +214,7 @@ function update () {
     var dataset = getChosenDataset(), // filename of the chosen dataset csv
     processedData; // the data while will be visualised
 
+    //for debug
     console.log(dataset);
 
     // if the dataset has changed from last time, load the new csv file
@@ -223,6 +225,9 @@ function update () {
 	    processedData = processData(data);
 	    currentDataset = dataset;
 	    
+            //here we only visualize checked crater types (grade)
+            //todo: sort the data points by crater type (grade), 
+            //and plot the later added types on top of existing plotted types
 	    drawingData = cullUnwantedTypes(processedData);
 	    redraw();
 	});
